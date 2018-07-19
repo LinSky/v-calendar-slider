@@ -1,5 +1,5 @@
 <template>
-    <div id="app">
+    <div id="app" class="app">
         <calendar-slider></calendar-slider>
     </div>
 </template>
@@ -16,4 +16,10 @@ export default {
 </script>
 
 <style>
+html,body{
+    height: 100%;
+}
+.app{
+    height: 100%;
+}
 </style>
