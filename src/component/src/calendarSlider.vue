@@ -9,7 +9,7 @@
                 <div class="days">
                     <template v-for="weekArr in getWeeksDates(startDate)">
                         <template v-for="day in weekArr">
-                            <div class="day">
+                            <div class="day" :class="{'not_current_month': !day.isCurrentMonth}">
                                 <div class="date">{{day.date.split('-')[2]}}</div>
                             </div>
                         </template>
@@ -30,6 +30,9 @@ export default {
         defaultMonth: {
             type: String,
             default: monthUtil.getDefaultMonthStr()
+        },
+        'getEvents': {
+            type: Function
         }
     },
     data () {
@@ -53,12 +56,13 @@ export default {
 
     },
     created () {
-        console.log(this.getWeeksDates(this.startDates[1]));
+        console.log(this.getWeeksDates('2018-08-01'));
     },
     methods: {
         getWeeksDates (date) {
             let vm = this,
                 now = new Date (),
+                current = new Date(date),
                 startDate = new Date(date),
                 startWeekDay = startDate.getDay()
 
@@ -67,10 +71,10 @@ export default {
             for (var i = 0; i < 6; i++) {
                 var week = []
                 for (var k = 0; k < 7; k++) {
-                    console.log(startDate);
                     week.push({
                         theDay: startDate.getDate(),
                         isToday: now.toDateString() == startDate.toDateString(),
+                        isCurrentMonth: current.getFullYear() === startDate.getFullYear() && current.getMonth() === startDate.getMonth(),
                         weekDay: k,
                         date: monthUtil.date2str(startDate)
                     })
@@ -98,8 +102,9 @@ export default {
         top: 0;
         -webkit-transition: all 0.5s ease-out;
         transition: all 0.5s ease-out;
+        transform: translateY(100%);
         &:first-child{
-            transform: translateY(-100%);
+            transform: translateY(0);
         }
         &:last-child{
             transform: translateY(100%);
@@ -116,11 +121,11 @@ export default {
                 flex: 1;
                 text-align: center;
                 font-size: 12px;
-                color: #333;
+                color: #999;
             }
         }
         .days{
-            height: 84%;
+            height: 90%;
             width: 100%;
             display: flex;
             flex-wrap: wrap;
@@ -136,10 +141,15 @@ export default {
                 &:nth-child(7n){
                     border-right: none;
                 }
+                &.not_current_month{
+                    .date{
+                        opacity: .3;
+                    }
+                }
                 .date{
                     font-size: 12px;
-                    color: #666;
-                    text-align: center;
+                    color: #333;
+                    padding: 0 10px; line-height: 24px;
                 }
             }
         }
