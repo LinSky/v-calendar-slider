@@ -1,6 +1,6 @@
 <template>
     <div id="app" class="app">
-        <calendar-slider :getEvents="getEventsHandler"></calendar-slider>
+        <calendar-slider :beforeGenerateDate="beforeGenerateDateHandler"></calendar-slider>
     </div>
 </template>
 
@@ -13,18 +13,19 @@ export default {
         }
     },
     methods: {
-        getEventsHandler (date) {
-            console.log(date);
-            return [
-                {
-                    date: '2018-06-05',
-                    number: 3
-                },
-                {
-                    date: '2018-06-10',
-                    number: 3
-                }
-            ]
+        beforeGenerateDateHandler (date) {
+            
+                return [
+                    {
+                        date: '2018-06-05',
+                        number: 3
+                    },
+                    {
+                        date: '2018-06-06',
+                        number: 15
+                    },
+                ]
+
         }
     }
 }

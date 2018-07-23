@@ -1,16 +1,17 @@
 <template>
     <div class="calendar_slider">
-        <template v-for="startDate in startDates">
+        <template v-for="month in calendars">
             <div class="slider_item">
-                <div class="month">{{startDate.substr(0, 7)}}</div>
+                <div class="month">{{month[1][0].date.substr(0, 7)}}</div>
                 <div class="weeks">
                     <div v-for="week in weeks">{{week}}</div>
                 </div>
                 <div class="days">
-                    <template v-for="weekArr in getWeeksDates(startDate)">
-                        <template v-for="day in weekArr">
+                    <template v-for="week in month">
+                        <template v-for="day in week">
                             <div class="day" :class="{'not_current_month': !day.isCurrentMonth}">
                                 <div class="date">{{day.date.split('-')[2]}}</div>
+                                <div class="event_num">{{day.eventNum}}</div>
                             </div>
                         </template>
                     </template>
@@ -31,13 +32,14 @@ export default {
             type: String,
             default: monthUtil.getDefaultMonthStr()
         },
-        'getEvents': {
+        'beforeGenerateDate': {
             type: Function
         }
     },
     data () {
         return {
-            weeks: ['日', '一', '二', '三', '四', '五', '六']
+            weeks: ['日', '一', '二', '三', '四', '五', '六'],
+            calendars: []
         }
     },
     computed: {
@@ -56,7 +58,9 @@ export default {
 
     },
     created () {
-        console.log(this.getWeeksDates('2018-08-01'));
+        for (var i = 0; i < this.startDates.length; i++) {
+            this.getWeeksDates(this.startDates[i])
+        }
     },
     methods: {
         getWeeksDates (date) {
@@ -67,22 +71,37 @@ export default {
                 startWeekDay = startDate.getDay()
 
             startDate.setDate(startDate.getDate() - startWeekDay)
-            let calendar = []
-            for (var i = 0; i < 6; i++) {
-                var week = []
-                for (var k = 0; k < 7; k++) {
-                    week.push({
-                        theDay: startDate.getDate(),
-                        isToday: now.toDateString() == startDate.toDateString(),
-                        isCurrentMonth: current.getFullYear() === startDate.getFullYear() && current.getMonth() === startDate.getMonth(),
-                        weekDay: k,
-                        date: monthUtil.date2str(startDate)
-                    })
-                    startDate.setDate(startDate.getDate() + 1)
-                }
-                calendar.push(week)
+            if (typeof vm.beforeGenerateDate === 'function') {
+                let pro = new Promise((resolve, reject) => {
+                    resolve(vm.beforeGenerateDate())
+                })
+                pro.then((events)=>{
+                    let calendar = []
+                    for (var i = 0; i < 6; i++) {
+                        var week = []
+                        for (var k = 0; k < 7; k++) {
+                            week.push({
+                                theDay: startDate.getDate(),
+                                isToday: now.toDateString() == startDate.toDateString(),
+                                isCurrentMonth: current.getFullYear() === startDate.getFullYear() && current.getMonth() === startDate.getMonth(),
+                                weekDay: k,
+                                date: monthUtil.date2str(startDate),
+                                eventNum: vm.markEvent(events, monthUtil.date2str(startDate))
+                            })
+                            startDate.setDate(startDate.getDate() + 1)
+                        }
+                        calendar.push(week)
+                    }
+                    vm.calendars.push(calendar)
+                })
             }
-            return calendar
+        },
+        markEvent (events, date) {
+            for (var i = 0; i < events.length; i++) {
+                if (events[i].date == date) {
+                    return events[i].number
+                }
+            }
         }
     }
 }
