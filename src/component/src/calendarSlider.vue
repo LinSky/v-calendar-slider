@@ -11,7 +11,7 @@
                         <template v-for="day in week">
                             <div class="day" :class="{'not_current_month': !day.isCurrentMonth}">
                                 <div class="date">{{day.date.split('-')[2]}}</div>
-                                <div class="event_num">{{day.eventNum}}</div>
+                                <div class="event_num" v-if="day.eventNum">{{day.eventNum}}</div>
                             </div>
                         </template>
                     </template>
@@ -32,8 +32,8 @@ export default {
             type: String,
             default: monthUtil.getDefaultMonthStr()
         },
-        'beforeGenerateDate': {
-            type: Function
+        url: {
+            type: String
         }
     },
     data () {
@@ -61,6 +61,7 @@ export default {
         for (var i = 0; i < this.startDates.length; i++) {
             this.getWeeksDates(this.startDates[i])
         }
+
     },
     methods: {
         getWeeksDates (date) {
@@ -71,11 +72,12 @@ export default {
                 startWeekDay = startDate.getDay()
 
             startDate.setDate(startDate.getDate() - startWeekDay)
-            if (typeof vm.beforeGenerateDate === 'function') {
-                let pro = new Promise((resolve, reject) => {
-                    resolve(vm.beforeGenerateDate())
-                })
-                pro.then((events)=>{
+            if (vm.url) {
+                monthUtil.fetch({
+                    method: 'get',
+                    url: vm.url,
+                    data: {month: date}
+                }).then((res)=>{
                     let calendar = []
                     for (var i = 0; i < 6; i++) {
                         var week = []
@@ -86,7 +88,7 @@ export default {
                                 isCurrentMonth: current.getFullYear() === startDate.getFullYear() && current.getMonth() === startDate.getMonth(),
                                 weekDay: k,
                                 date: monthUtil.date2str(startDate),
-                                eventNum: vm.markEvent(events, monthUtil.date2str(startDate))
+                                eventNum: vm.markEvent(res, monthUtil.date2str(startDate))
                             })
                             startDate.setDate(startDate.getDate() + 1)
                         }
@@ -108,7 +110,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .calendar_slider{
-    height: 100%;
+    height: 100vh;
     position: relative;
     background-color: #FFF;
     overflow: hidden;
@@ -121,22 +123,22 @@ export default {
         top: 0;
         -webkit-transition: all 0.5s ease-out;
         transition: all 0.5s ease-out;
-        transform: translateY(100%);
+        transform: translateY(0);
         &:first-child{
-            transform: translateY(0);
+            transform: translateY(-100%);
         }
         &:last-child{
             transform: translateY(100%);
         }
         .month{
-            line-height: 36px;
+            line-height: 6vh;
             text-align: center;
             font-size: 14px;
         }
         .weeks{
             display: flex; border-bottom: #ddd solid 1px;
             div{
-                line-height: 24px;
+                line-height: 4vh;
                 flex: 1;
                 text-align: center;
                 font-size: 12px;
@@ -144,14 +146,14 @@ export default {
             }
         }
         .days{
-            height: 90%;
+            height: 90vh;
             width: 100%;
             display: flex;
             flex-wrap: wrap;
             align-items: stretch;
             align-content: flex-start;
             .day{
-                height: 16.2%;
+                height: 16.66%;
                 width: 14.28%;
                 border-bottom: #ddd solid 1px;
                 border-right: #ddd solid 1px;
@@ -166,9 +168,22 @@ export default {
                     }
                 }
                 .date{
-                    font-size: 12px;
+                    font-size: 14px;
                     color: #333;
                     padding: 0 10px; line-height: 24px;
+                }
+                .event_num{
+                    position: absolute;
+                    bottom: 5px;
+                    right: 5px;
+                    font-size: 12px;
+                    width: 24px;
+                    height: 24px;
+                    background-color: #dd3629;
+                    color: #FFF;
+                    text-align: center;
+                    line-height: 24px;
+                    border-radius: 50%;
                 }
             }
         }

@@ -6,8 +6,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
-    "build": "cross-env NODE_ENV=production webpack"
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot && json-server db.json -p 9527",
+    "build": "cross-env NODE_ENV=production webpack",
+    "mock": "json-server db.json -p 9527"
   },
   "dependencies": {
     "moment": "^2.22.2",
