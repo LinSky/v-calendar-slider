@@ -1,8 +1,10 @@
 # v-calendar-slider
 
-# v-week-slider
 ## 介绍
-一个基于Vue无限滑动选择日期的手机端组件
+一个基于Vue，上下滑动切换月份日程管理组件
+
+## DEMO
+![demo](demo.gif)
 
 ## 安装
 ```html

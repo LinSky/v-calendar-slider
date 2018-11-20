@@ -29,7 +29,6 @@
 <script>
 
 import monthUtil from './monthUtil.js'
-console.log(monthUtil);
 export default {
     name: 'calendarSlider',
     props: {
