@@ -1,6 +1,6 @@
 <template>
     <div id="app" class="app">
-        <calendar-slider url="http://localhost:9527/events"></calendar-slider>
+        <calendar-slider :events="events" @monthChanged="monthChangedHandle" @dateClick="dateClickHandle"></calendar-slider>
     </div>
 </template>
 
@@ -9,23 +9,39 @@ export default {
     name: 'app',
     data () {
         return {
-
+            events: [
+                {
+                    date: '2018-11-22',
+                    number: 100
+                },
+                {
+                    date: '2018-11-25',
+                    number: 2
+                }
+            ]
         }
     },
+    created () {
+
+    },
     methods: {
-        beforeGenerateDateHandler (date) {
-            // setTimeout(()=>{
-                return [
+        monthChangedHandle (currentMonth) {
+            setTimeout(()=>{
+                this.events = [
                     {
-                        date: '2018-11-10',
-                        number: 3
+                        date: '2018-12-22',
+                        number: 2
                     },
                     {
-                        date: '2018-11-20',
-                        number: 15
-                    },
+                        date: '2018-12-26',
+                        number: 2
+                    }
                 ]
-            // }, 200)
+            }, 100)
+        },
+
+        dateClickHandle (date) {
+            console.log(date);
         }
 
 

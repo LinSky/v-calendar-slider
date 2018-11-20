@@ -1,18 +1,31 @@
 # v-calendar-slider
 
-> v-calendar-slider
+# v-week-slider
+## 介绍
+一个基于Vue无限滑动选择日期的手机端组件
 
-## Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
+## 安装
+```html
+npm install --save v-calendar-slider
 ```
 
-For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
+## 使用
+```html
+import calendarSlider from 'v-calendar-slider'
+
+Vue.use(calendarSlider)
+
+<calendar-slider :events="events" @monthChanged="monthChangedHandle" @dateClick="dateClickHandle"></calendar-slider>
+```   
+
+## Props
+|prop|必选|类型|说明|
+|:----    |:---|:----- |-----   |
+|events   | false  | Array  | 事务列表 |
+|defaultActiveMonth  | false  | String  |默认月份（YYYY-MM）  |
+
+## events
+|名称|说明|回调参数|
+|:----    |:---|:----- |
+| dateClick  | 点击日期触发时间  |  点击的日期（YYYY-MM-DD） |
+| monthChanged | slider切换后回调  | 切换后当前月份 （YYYY-MM） |

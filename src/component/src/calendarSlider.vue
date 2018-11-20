@@ -14,9 +14,9 @@
                 <div class="days">
                     <template v-for="week in month">
                         <template v-for="day in week">
-                            <div class="day" :class="{'not_current_month': !day.isCurrentMonth}">
+                            <div class="day" :class="{'not_current_month': !day.isCurrentMonth}" @click.stop="dateClickHandle(day.date)">
                                 <div class="date">{{day.date.split('-')[2]}}</div>
-                                <!-- <div class="event_num" v-if="day.eventNum">{{day.eventNum}}</div> -->
+                                <div class="event_num" v-if="day.isCurrentMonth && day.eventNum">{{day.eventNum}}</div>
                             </div>
                         </template>
                     </template>
@@ -33,19 +33,22 @@ console.log(monthUtil);
 export default {
     name: 'calendarSlider',
     props: {
-        // defaultMonth: {
-        //     type: String,
-        //     default: monthUtil.getDefaultMonthStr()
-        // },
-        url: {
-            type: String
+        defaultActiveMonth: {
+            type: String,
+            default: monthUtil.getDefaultMonthStr()
+        },
+        events: {
+            type: Array,
+            default: function () {
+                return []
+            }
         }
     },
     data () {
         return {
             weeks: ['日', '一', '二', '三', '四', '五', '六'],
             calendars: [],
-            defaultMonth: monthUtil.getDefaultMonthStr(),
+            defaultMonth: this.defaultActiveMonth || monthUtil.getDefaultMonthStr(),
             direction: null,
             activeIndex: 1,
             start: {
@@ -79,7 +82,15 @@ export default {
     watch: {
         defaultMonth: {
             handler: function (newVal) {
-                console.log(newVal);
+                for (var i = 0; i < this.startDates.length; i++) {
+                    this.getWeeksDates(this.startDates[i])
+                }
+            },
+            deep: true
+        },
+        events: {
+            handler: function (newVal) {
+                this.calendars = []
                 for (var i = 0; i < this.startDates.length; i++) {
                     this.getWeeksDates(this.startDates[i])
                 }
@@ -96,6 +107,10 @@ export default {
         }
     },
     methods: {
+        dateClickHandle (date) {
+            this.$emit('dateClick', date)
+        },
+
         getTransform (index) {
             let vm = this
             let style = {}
@@ -125,32 +140,25 @@ export default {
                 startWeekDay = startDate.getDay()
 
             startDate.setDate(startDate.getDate() - startWeekDay)
-            //if (vm.url) {
-                // monthUtil.fetch({
-                //     method: 'get',
-                //     url: vm.url,
-                //     data: {month: date},
-                //     async: true
-                // }).then((res)=>{
-                    let calendar = []
-                    for (var i = 0; i < 6; i++) {
-                        var week = []
-                        for (var k = 0; k < 7; k++) {
-                            week.push({
-                                theDay: startDate.getDate(),
-                                isToday: now.toDateString() == startDate.toDateString(),
-                                isCurrentMonth: current.getFullYear() === startDate.getFullYear() && current.getMonth() === startDate.getMonth(),
-                                weekDay: k,
-                                date: monthUtil.date2str(startDate)
-                                //eventNum: vm.markEvent(res, monthUtil.date2str(startDate))
-                            })
-                            startDate.setDate(startDate.getDate() + 1)
-                        }
-                        calendar.push(week)
-                    }
-                    vm.calendars.push(calendar)
-                //})
-            //}
+
+            let calendar = []
+            for (var i = 0; i < 6; i++) {
+                var week = []
+                for (var k = 0; k < 7; k++) {
+                    week.push({
+                        theDay: startDate.getDate(),
+                        isToday: now.toDateString() == startDate.toDateString(),
+                        isCurrentMonth: current.getFullYear() === startDate.getFullYear() && current.getMonth() === startDate.getMonth(),
+                        weekDay: k,
+                        date: monthUtil.date2str(startDate),
+                        eventNum: vm.markEvent(vm.events, monthUtil.date2str(startDate))
+                    })
+                    startDate.setDate(startDate.getDate() + 1)
+                }
+                calendar.push(week)
+            }
+            vm.calendars.push(calendar)
+
         },
 
         /**
@@ -211,7 +219,6 @@ export default {
             vm.distan.x = vm.end.x - vm.start.x
             vm.distan.y = vm.end.y - vm.start.y
             vm.getTouchDirection(vm.distan.x, vm.distan.y)
-            console.log(vm.direction);
             if (vm.direction === 'top') {
                 vm.activeIndex = 2
             } else if (vm.direction === 'bottom') {
@@ -230,18 +237,18 @@ export default {
             let vm = this
             vm.isAnimation = false
             if (index === 1 && this.activeIndex === 2) {
-                // vm.startDates.push(monthUtil.getNextMonthStartStr(vm.startDates[2]))
-                // vm.startDates.shift()
                 vm.defaultMonth = vm.startDates[2].substr(0, 7)
                 vm.activeIndex = 1
                 vm.calendars = []
+                vm.$emit('monthChanged', vm.defaultMonth)
             }else if (index === 1 && this.activeIndex === 0) {
-                // vm.startDates.unshift(monthUtil.getPrevMonthStartStr(vm.startDates[2]))
-                // vm.startDates.pop()
                 vm.defaultMonth = vm.startDates[0].substr(0, 7)
                 vm.activeIndex = 1
                 vm.calendars = []
+                vm.$emit('monthChanged', vm.defaultMonth)
             }
+
+
         },
 
         /**
@@ -258,7 +265,6 @@ export default {
             let vm = this
             if (Math.abs(y) > 20) {
                 let angle = -vm.getAngle(x, y)
-                console.log(angle);
                 if (angle >= 45 && angle < 135) {//向上
                     vm.direction = 'top'
                 } else if (angle >= -135 && angle < -45) {//向下
