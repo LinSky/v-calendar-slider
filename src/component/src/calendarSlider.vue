@@ -7,7 +7,7 @@
         @touchend="touchendHandle">
         <template v-for="(month, index) in calendars">
             <div class="slider_item" :style="getTransform(index)" @webkit-transition-end="onTransitionEnd(index)" @transitionend="onTransitionEnd(index)">
-                <div class="month">{{month[1][0].date.substr(0, 7)}}</div>
+                <div class="month"><span>{{month[1][0].date.substr(0, 7)}}</span></div>
                 <div class="weeks">
                     <div v-for="week in weeks">{{week}}</div>
                 </div>
@@ -46,6 +46,7 @@ export default {
     data () {
         return {
             weeks: ['日', '一', '二', '三', '四', '五', '六'],
+            modalVisible: true,
             calendars: [],
             defaultMonth: this.defaultActiveMonth || monthUtil.getDefaultMonthStr(),
             direction: null,
@@ -279,7 +280,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .calendar_slider{
-    height: 100vh;
+    height: 100%;
     position: relative;
     background-color: #FFF;
     overflow: hidden;
@@ -291,31 +292,40 @@ export default {
         left: 0;
         top: 0;
         .month{
-            line-height: 6vh;
+            display: table;
+            width: 100%;
+            height: 6%;
             text-align: center;
             font-size: 16px;
             font-weight: bold;
             color: #333;
+            span{
+                display: table-cell;
+                vertical-align: middle;
+            }
         }
         .weeks{
-            display: flex; border-bottom: #ddd solid 1px;
+            display: flex;
+            border-bottom: #ddd solid 1px;
+            align-items: center;
+            justify-content: center;
+            height: 4%;
             div{
-                line-height: 4vh;
                 flex: 1;
                 text-align: center;
                 font-size: 12px;
-                color: #999;
+                color: #666;
             }
         }
         .days{
-            height: 90vh;
+            height: 90%;
             width: 100%;
             display: flex;
             flex-wrap: wrap;
             align-items: stretch;
             align-content: flex-start;
             .day{
-                height: 16.66%;
+                height: 16.65%;
                 width: 14.28%;
                 border-bottom: #ddd solid 1px;
                 border-right: #ddd solid 1px;
@@ -351,4 +361,29 @@ export default {
         }
     }
 }
+
+.events_modal{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    max-width: 750px;
+    width: 100%;
+    z-index: 999;
+    transition: all 0.2s linear;
+    .content{
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .main{
+            background: #FFF; transition: all 0.2s linear;
+        }
+    }
+}
+
+
 </style>
