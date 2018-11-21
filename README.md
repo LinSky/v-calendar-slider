@@ -23,8 +23,22 @@ Vue.use(calendarSlider)
 ## Props
 |prop|必选|类型|说明|
 |:----    |:---|:----- |-----   |
-|events   | false  | Array  | 事务列表 |
+|events   | false  | Array[Object]  | 事务列表 |
 |defaultActiveMonth  | false  | String  |默认月份（YYYY-MM）  |
+
+###prop: events 格式
+```html
+[
+    {
+        date: '2018-12-22',
+        number: 2
+    },
+    {
+        date: '2018-12-26',
+        number: 2
+    }
+]
+```   
 
 ## events
 |名称|说明|回调参数|
