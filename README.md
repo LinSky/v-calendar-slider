@@ -26,7 +26,7 @@ Vue.use(calendarSlider)
 |events   | false  | Array[Object]  | 事务列表 |
 |defaultActiveMonth  | false  | String  |默认月份（YYYY-MM）  |
 
-###prop: events 格式
+prop: events 格式
 ```html
 [
     {
